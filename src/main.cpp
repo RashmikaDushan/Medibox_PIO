@@ -17,8 +17,8 @@
 
 #define BUZZER 18
 
-#define LED_1 15
-#define LED_2 2
+#define LED_GREEN 15
+#define LED_RED 2
 
 #define CANCEL 34
 #define UP 35
@@ -55,17 +55,17 @@ int UTC_OFFSET = 19800;
 String months[] = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
 
 bool alarm_enabled = false;
-int n_alarms = 2;
-int alarm_hours[] = {0, 0};
-int alarm_minutes[] = {1, 10};
-bool alarm_triggered[] = {false, false};
+int n_alarms = 3;
+int alarm_hours[] = {0, 0, 0};
+int alarm_minutes[] = {1, 10, 0};
+bool alarm_triggered[] = {false, false, false, false};
 
 unsigned long timeNow = 0;
 unsigned long timelast = 0;
 
 int current_mode = 0;
-int max_modes = 4;
-String options[] = {"1 - Set Time", "2 - Set Alarm 1", "3 - Set Alarm 2", "4 - Remove Alarm","5 - Set Timezone"};
+int max_modes = 6;
+String options[] = {"1 - Set Time", "2 - Set Alarm 1", "3 - Set Alarm 2","4 - Set Alarm 3", "5 - Remove Alarm","6 - Set Timezone"};
 
 // function to print a line of text in a given text size and the given position
 void print_line(String text, int text_size, int row, int column)
@@ -181,21 +181,25 @@ void ring_alarm()
 {
   // Show message on display
   display.clearDisplay();
-  print_line("Medicine Time", 2, 0, 0);
+  print_line("Alarm 1", 1, 0, 0);
+  print_line("Medicine Time", 1, 11, 0);
+  Serial.println("Alarm is ringing");
 
-  // light up LED 1
-  digitalWrite(LED_1, HIGH);
+  // light up both LEDs
+  digitalWrite(LED_GREEN, HIGH);
+  digitalWrite(LED_RED, HIGH);
 
   // ring the buzzer
-  while (digitalRead(CANCEL) == HIGH)
+  while (digitalRead(CANCEL) == LOW)
   {
     for (int i = 0; 1 < n_notes; i++)
     {
-      if (digitalRead(CANCEL) == LOW)
+      if (digitalRead(CANCEL) == HIGH)
       {
         delay(200);
         break;
       }
+      Serial.println(String(notes[i]));
       tone(BUZZER, notes[i]);
       delay(500);
       noTone(BUZZER);
@@ -203,7 +207,8 @@ void ring_alarm()
     }
   }
   delay(200);
-  digitalWrite(LED_1, LOW);
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_RED, LOW);
 }
 
 // function to automatically update the current time while checking for alarms
@@ -271,10 +276,10 @@ void set_time_zone()
     display.clearDisplay();
     print_line("Enter time zone: ", 0, 0, 1);
     if(minute_offset < 0){
-      print_line("-"+String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 0, 11, 1);
+      print_line("-"+String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 1, 11, 0);
     }
     else{
-      print_line(String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 0, 11, 1);
+      print_line(String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 1, 11, 0);
     }
     int pressed = button_press();
     if (pressed == UP)
@@ -294,15 +299,15 @@ void set_time_zone()
       UTC_OFFSET = minute_offset*60;
       Serial.println(UTC_OFFSET);
       display.clearDisplay();
-      print_line("Time zone set.", 0, 0, 1);
+      print_line("Time zone set.", 1, 0, 0);
       update_time_wifi();
       return;
     }
     else if (pressed == CANCEL)
     {
       display.clearDisplay();
-      print_line("Default timezone set.", 0, 0, 1);
-      print_line("UTC+5.30", 0, 11, 1);
+      print_line("Default timezone set.", 1, 0, 0);
+      print_line("UTC+5.30", 1, 11, 0);
       update_time_wifi();
       return;
     }
@@ -315,7 +320,7 @@ void set_time()
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
+    print_line("Enter hour: " + String(temp_hour), 1, 0, 0);
 
     int pressed = button_press();
     if (pressed == UP)
@@ -351,7 +356,7 @@ void set_time()
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
+    print_line("Enter minute: " + String(temp_minute), 1, 0, 0);
 
     int pressed = button_press();
     if (pressed == UP)
@@ -386,13 +391,12 @@ void set_time()
   }
 
   display.clearDisplay();
-  print_line("Time is set", 0, 0, 2);
+  print_line("Time is set", 1, 0, 0);
   delay(1000);
 }
 
 void set_alarm(int alarm)
 {
-
   int temp_hour = alarm_hours[alarm];
   while (true)
   {
@@ -402,14 +406,12 @@ void set_alarm(int alarm)
     int pressed = button_press();
     if (pressed == UP)
     {
-      delay(200);
       temp_hour += 1;
       temp_hour = temp_hour % 24;
     }
 
     else if (pressed == DOWN)
     {
-      delay(200);
       temp_hour -= 1;
       if (temp_hour < 0)
       {
@@ -419,14 +421,12 @@ void set_alarm(int alarm)
 
     else if (pressed == OK)
     {
-      delay(200);
       alarm_hours[alarm] = temp_hour;
       break;
     }
 
     else if (pressed == CANCEL)
     {
-      delay(200);
       break;
     }
   }
@@ -440,14 +440,12 @@ void set_alarm(int alarm)
     int pressed = button_press();
     if (pressed == UP)
     {
-      delay(200);
       temp_minute += 1;
       temp_minute = temp_minute % 60;
     }
 
     else if (pressed == DOWN)
     {
-      delay(200);
       temp_minute -= 1;
       if (temp_minute < 0)
       {
@@ -457,14 +455,13 @@ void set_alarm(int alarm)
 
     else if (pressed == OK)
     {
-      delay(200);
       alarm_minutes[alarm] = temp_minute;
+      alarm_enabled = true;
       break;
     }
 
     else if (pressed == CANCEL)
     {
-      delay(200);
       break;
     }
   }
@@ -479,16 +476,16 @@ void run_mode(int mode)
   {
     set_time();
   }
-  else if (mode == 1 || mode == 2)
+  else if (mode == 1 || mode == 2 || mode == 3)
   {
     set_alarm(mode - 1);
   }
 
-  else if (mode == 3)
+  else if (mode == 4)
   {
     alarm_enabled = false;
   }
-  else if(mode == 4){
+  else if(mode == 5){
     set_time_zone();
     
   }
@@ -503,10 +500,10 @@ while (true){
   int pressed = button_press();
     if (pressed == UP)
     {
-      current_mode = (current_mode+1)%5;
+      current_mode = (current_mode+1)%max_modes;
     }
     else if (pressed == DOWN){
-      current_mode = (current_mode+4)%5;
+      current_mode = (current_mode+5)%max_modes;
     }
     else if (pressed == OK)
     {
@@ -518,36 +515,6 @@ while (true){
       return;
     }
 }
-  // {
-  //   display.clearDisplay();
-    
-
-  //   int pressed = button_press();
-
-  //   if (pressed == UP)
-  //   {
-  //     current_mode += 1;
-  //     current_mode %= max_modes;
-  //     delay(200);
-  //   }
-
-  //   else if (pressed == DOWN)
-  //   {
-  //     current_mode -= 1;
-  //     if (current_mode < 0)
-  //     {
-  //       current_mode = max_modes - 1;
-  //     }
-  //     delay(200);
-  //   }
-
-  //   else if (pressed == OK)
-  //   {
-  //     Serial.println(current_mode);
-  //     delay(200);
-  //     run_mode(current_mode);
-  //   }
-  // }
 }
 
 void check_temp_humd(void)
@@ -557,16 +524,16 @@ void check_temp_humd(void)
   if (data.temperature > 35)
   {
     all_good = false;
-    digitalWrite(LED_2, HIGH);
-    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
     print_line("TEMP HIGH", 1, 45, 0);
     alarm_temp_humidity(2, 7);
   }
   else if (data.temperature < 25)
   {
     all_good = false;
-    digitalWrite(LED_2, HIGH);
-    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
     print_line("TEMP LOW", 1, 45, 0);
     alarm_temp_humidity(2, 0);
   }
@@ -577,16 +544,16 @@ void check_temp_humd(void)
   if (data.humidity > 85)
   {
     all_good = false;
-    digitalWrite(LED_2, HIGH);
-    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
     print_line("HUMD HIGH", 1, 56, 0);
     alarm_temp_humidity(3, 7);
   }
   else if (data.humidity < 35)
   {
     all_good = false;
-    digitalWrite(LED_2, HIGH);
-    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, LOW);
     print_line("HUMD LOW", 1, 56, 0);
     alarm_temp_humidity(3, 0);
   }
@@ -596,8 +563,8 @@ void check_temp_humd(void)
   }
   if (all_good)
   {
-    digitalWrite(LED_2, LOW);
-    digitalWrite(LED_1, HIGH);
+    digitalWrite(LED_RED, LOW);
+    digitalWrite(LED_GREEN, HIGH);
   }
 }
 
@@ -606,8 +573,8 @@ void setup()
   Serial.begin(9600);
 
   pinMode(BUZZER, OUTPUT);
-  pinMode(LED_1, OUTPUT);
-  pinMode(LED_2, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
   pinMode(CANCEL, INPUT);
   pinMode(UP, INPUT);
   pinMode(DOWN, INPUT);
