@@ -50,7 +50,7 @@ int hours = 0;
 int minutes = 0;
 int seconds = 0;
 
-int UTC_OFFSET = 19800;
+int UTC_OFFSET = 0;
 
 String months[] = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
 
@@ -234,87 +234,81 @@ void update_time_with_check_alarm()
 }
 
 // function to wait for button press in the menu
-int wait_for_button_press()
+//done
+int button_press()
 {
-  while (true)
-  {
-    if (digitalRead(UP) == LOW)
+    if (digitalRead(UP) == HIGH)
     {
+      Serial.println("UP");
       delay(200);
       return UP;
     }
 
-    else if (digitalRead(DOWN) == LOW)
+    else if (digitalRead(DOWN) == HIGH)
     {
+      Serial.println("DOWN");
       delay(200);
       return DOWN;
     }
-    else if (digitalRead(CANCEL) == LOW)
+    else if (digitalRead(CANCEL) == HIGH)
     {
+      Serial.println("CANCEL");
       delay(200);
       return CANCEL;
     }
-    else if (digitalRead(OK) == LOW)
+    else if (digitalRead(OK) == HIGH)
     {
+      Serial.println("OK");
       delay(200);
       return OK;
     }
     update_time();
-  }
+    return 0;
+  
 }
 
+//done
 void set_time_zone()
 {
-  int hour_offset = 0;
   int minute_offset = 0;
   while (true)
   {
-    print_line("Enter time zone: " + String(hour_offset) + " : " + String(abs(minute_offset)), 0, 0, 1);
-    int pressed = wait_for_button_press();
+    display.clearDisplay();
+    print_line("Enter time zone: ", 0, 0, 1);
+    if(minute_offset < 0){
+      print_line("-"+String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 0, 11, 1);
+    }
+    else{
+      print_line(String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 0, 11, 1);
+    }
+    int pressed = button_press();
     if (pressed == UP)
     {
-      delay(200);
-      if(hour_offset < 12 && (minute_offset == 30 || minute_offset == -30)){
-        hour_offset += 1;
-        minute_offset = 0;
-      }
-      else if(hour_offset < 0 && minute_offset == 0){
-        minute_offset = -30;
-        hour_offset += 1;
-      }
-      else if(hour_offset < 12 && minute_offset == 0){
-        minute_offset = 30;
+      if(minute_offset<720){
+        minute_offset+=30;
       }
     }
 
     else if (pressed == DOWN)
     {
-      if(hour_offset > -12 && (minute_offset == 30 || minute_offset == -30)){
-        hour_offset -= 1;
-        minute_offset = 0;
+      if(minute_offset>-720){
+        minute_offset-=30;
       }
-      else if(hour_offset > 0 && minute_offset == 0){
-        minute_offset = 30;
-        hour_offset -=1;
-      }
-      else if(hour_offset > -12 && minute_offset == 0){
-        minute_offset = -30;
-      }
-      
     }
     else if (pressed == OK)
     {
-      delay(200);
-      UTC_OFFSET = hour_offset*3600+minute_offset*60;
+      UTC_OFFSET = minute_offset*60;
+      Serial.println(UTC_OFFSET);
       print_line("Time zone set.", 0, 0, 1);
+      return;
     }
     else if (pressed == CANCEL)
     {
-      delay(200);
       return;
     }
   }
 }
+
 void set_time()
 {
   int temp_hour = hours;
@@ -323,7 +317,7 @@ void set_time()
     display.clearDisplay();
     print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
 
-    int pressed = wait_for_button_press();
+    int pressed = button_press();
     if (pressed == UP)
     {
       delay(200);
@@ -359,7 +353,7 @@ void set_time()
     display.clearDisplay();
     print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
 
-    int pressed = wait_for_button_press();
+    int pressed = button_press();
     if (pressed == UP)
     {
       delay(200);
@@ -405,7 +399,7 @@ void set_alarm(int alarm)
     display.clearDisplay();
     print_line("Enter hour: " + String(temp_hour), 0, 0, 2);
 
-    int pressed = wait_for_button_press();
+    int pressed = button_press();
     if (pressed == UP)
     {
       delay(200);
@@ -443,7 +437,7 @@ void set_alarm(int alarm)
     display.clearDisplay();
     print_line("Enter minute: " + String(temp_minute), 0, 0, 2);
 
-    int pressed = wait_for_button_press();
+    int pressed = button_press();
     if (pressed == UP)
     {
       delay(200);
@@ -504,7 +498,7 @@ void go_to_menu(void)
     display.clearDisplay();
     print_line(options[current_mode], 2, 0, 0);
 
-    int pressed = wait_for_button_press();
+    int pressed = button_press();
 
     if (pressed == UP)
     {
@@ -629,6 +623,8 @@ void setup()
   delay(1000);
   display.clearDisplay();
   print_line("Connected to Wifi!!!", 1, 0, 0);
+
+  set_time_zone();
 
   update_time_wifi();
 }
