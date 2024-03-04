@@ -44,21 +44,21 @@
       "id": "btn1",
       "top": -205,
       "left": 96,
-      "attrs": { "color": "green" }
+      "attrs": { "color": "black" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn2",
       "top": -137.8,
       "left": 96,
-      "attrs": { "color": "green" }
+      "attrs": { "color": "black" }
     },
     {
       "type": "wokwi-pushbutton",
       "id": "btn3",
       "top": -205,
       "left": 230.4,
-      "attrs": { "color": "green" }
+      "attrs": { "color": "red" }
     },
     {
       "type": "wokwi-pushbutton",

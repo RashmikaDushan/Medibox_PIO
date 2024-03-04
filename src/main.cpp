@@ -50,7 +50,7 @@ int hours = 0;
 int minutes = 0;
 int seconds = 0;
 
-int UTC_OFFSET = 0;
+int UTC_OFFSET = 19800;
 
 String months[] = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
 
@@ -65,7 +65,7 @@ unsigned long timelast = 0;
 
 int current_mode = 0;
 int max_modes = 4;
-String options[] = {"1 - Set Time", "2 - Set Alarm 1", "3 - Set Alarm 2", "4 - Remove Alarm"};
+String options[] = {"1 - Set Time", "2 - Set Alarm 1", "3 - Set Alarm 2", "4 - Remove Alarm","5 - Set Timezone"};
 
 // function to print a line of text in a given text size and the given position
 void print_line(String text, int text_size, int row, int column)
@@ -144,12 +144,6 @@ void update_time(void)
       alarm_triggered[i] = false;
     }
   }
-
-  // Occasionally update the time from NTC server
-  //  if (minutes == 5)
-  //  {
-  //    update_time_wifi();
-  //  }
 }
 
 // alarm when the temp and the humidity are not in the range
@@ -173,6 +167,7 @@ void alarm_temp_humidity(int n, int note)
 // function to display the current time DD:HH:MM:SS
 void print_time_now(void)
 {
+  display.clearDisplay();
   print_line(String(days) + " " + month + " " + String(year), 1, 0, 0);
   print_line(String(hours), 2, 16, 0);
   print_line(":", 2, 16, 20);
@@ -288,7 +283,6 @@ void set_time_zone()
         minute_offset+=30;
       }
     }
-
     else if (pressed == DOWN)
     {
       if(minute_offset>-720){
@@ -299,11 +293,17 @@ void set_time_zone()
     {
       UTC_OFFSET = minute_offset*60;
       Serial.println(UTC_OFFSET);
+      display.clearDisplay();
       print_line("Time zone set.", 0, 0, 1);
+      update_time_wifi();
       return;
     }
     else if (pressed == CANCEL)
     {
+      display.clearDisplay();
+      print_line("Default timezone set.", 0, 0, 1);
+      print_line("UTC+5.30", 0, 11, 1);
+      update_time_wifi();
       return;
     }
   }
@@ -488,45 +488,69 @@ void run_mode(int mode)
   {
     alarm_enabled = false;
   }
+  else if(mode == 4){
+    set_time_zone();
+    
+  }
 }
 
 // function to navigate through the menu
 void go_to_menu(void)
 {
-  while (digitalRead(CANCEL) == HIGH)
-  {
-    display.clearDisplay();
-    print_line(options[current_mode], 2, 0, 0);
-
-    int pressed = button_press();
-
+while (true){
+  display.clearDisplay();
+  print_line(options[current_mode], 1, 0, 0);
+  int pressed = button_press();
     if (pressed == UP)
     {
-      current_mode += 1;
-      current_mode %= max_modes;
-      delay(200);
+      current_mode = (current_mode+1)%5;
     }
-
-    else if (pressed == DOWN)
-    {
-      current_mode -= 1;
-      if (current_mode < 0)
-      {
-        current_mode = max_modes - 1;
-      }
-      delay(200);
+    else if (pressed == DOWN){
+      current_mode = (current_mode+4)%5;
     }
-
     else if (pressed == OK)
     {
       Serial.println(current_mode);
-      delay(200);
       run_mode(current_mode);
     }
-  }
+    else if (pressed == CANCEL)
+    {
+      return;
+    }
+}
+  // {
+  //   display.clearDisplay();
+    
+
+  //   int pressed = button_press();
+
+  //   if (pressed == UP)
+  //   {
+  //     current_mode += 1;
+  //     current_mode %= max_modes;
+  //     delay(200);
+  //   }
+
+  //   else if (pressed == DOWN)
+  //   {
+  //     current_mode -= 1;
+  //     if (current_mode < 0)
+  //     {
+  //       current_mode = max_modes - 1;
+  //     }
+  //     delay(200);
+  //   }
+
+  //   else if (pressed == OK)
+  //   {
+  //     Serial.println(current_mode);
+  //     delay(200);
+  //     run_mode(current_mode);
+  //   }
+  // }
 }
 
-void check_temp(void)
+void check_temp_humd(void)
 {
   TempAndHumidity data = dhtSensor.getTempAndHumidity();
   bool all_good = true;
@@ -577,12 +601,6 @@ void check_temp(void)
   }
 }
 
-// void timeavailable(struct timeval *t)
-// {
-//   Serial.println("Got time adjustment from NTP!");
-//   printLocalTime();
-// }
-
 void setup()
 {
   Serial.begin(9600);
@@ -625,20 +643,14 @@ void setup()
   print_line("Connected to Wifi!!!", 1, 0, 0);
 
   set_time_zone();
-
-  update_time_wifi();
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-  update_time_with_check_alarm();
-  if (digitalRead(CANCEL) == LOW)
-  {
-    Serial.println("Menu");
+  if(button_press()==OK){
     go_to_menu();
   }
-  check_temp();
+  update_time_with_check_alarm();
+  check_temp_humd();
   delay(400);
-  display.clearDisplay();
 }
