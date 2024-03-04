@@ -50,6 +50,7 @@ int hours = 0;
 int minutes = 0;
 int seconds = 0;
 
+// UTC offset for NTC time server
 int UTC_OFFSET = 19800;
 
 String months[] = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
@@ -58,6 +59,7 @@ bool alarm_enabled = false;
 int n_alarms = 3;
 int alarm_hours[] = {0, 0, 0};
 int alarm_minutes[] = {1, 10, 0};
+
 bool alarm_triggered[] = {false, false, false, false};
 
 unsigned long timeNow = 0;
@@ -65,7 +67,7 @@ unsigned long timelast = 0;
 
 int current_mode = 0;
 int max_modes = 6;
-String options[] = {"1 - Set Time", "2 - Set Alarm 1", "3 - Set Alarm 2","4 - Set Alarm 3", "5 - Remove Alarm","6 - Set Timezone"};
+String options[] = {"1 - Set Time", "2 - Set Alarm 1", "3 - Set Alarm 2", "4 - Set Alarm 3", "5 - Remove Alarm", "6 - Set Timezone"};
 
 // function to print a line of text in a given text size and the given position
 void print_line(String text, int text_size, int row, int column)
@@ -179,12 +181,6 @@ void print_time_now(void)
 // ring an alarm
 void ring_alarm()
 {
-  // Show message on display
-  display.clearDisplay();
-  print_line("Alarm 1", 1, 0, 0);
-  print_line("Medicine Time", 1, 11, 0);
-  Serial.println("Alarm is ringing");
-
   // light up both LEDs
   digitalWrite(LED_GREEN, HIGH);
   digitalWrite(LED_RED, HIGH);
@@ -192,14 +188,13 @@ void ring_alarm()
   // ring the buzzer
   while (digitalRead(CANCEL) == LOW)
   {
-    for (int i = 0; 1 < n_notes; i++)
+    for (int i = 0; i < n_notes; i++)
     {
       if (digitalRead(CANCEL) == HIGH)
       {
         delay(200);
         break;
       }
-      Serial.println(String(notes[i]));
       tone(BUZZER, notes[i]);
       delay(500);
       noTone(BUZZER);
@@ -226,6 +221,11 @@ void update_time_with_check_alarm()
     {
       if (alarm_triggered[i] == false && hours == alarm_hours[i] && minutes == alarm_minutes[i])
       {
+        // Show message on display
+        display.clearDisplay();
+        print_line("Alarm " + String(i), 1, 0, 0);
+        print_line("Medicine Time", 1, 11, 0);
+        Serial.println("Alarm is ringing");
         ring_alarm(); // call the ringing function
         alarm_triggered[i] = true;
       }
@@ -234,40 +234,38 @@ void update_time_with_check_alarm()
 }
 
 // function to wait for button press in the menu
-//done
 int button_press()
 {
-    if (digitalRead(UP) == HIGH)
-    {
-      Serial.println("UP");
-      delay(200);
-      return UP;
-    }
+  if (digitalRead(UP) == HIGH)
+  {
+    Serial.println("UP");
+    delay(200);
+    return UP;
+  }
 
-    else if (digitalRead(DOWN) == HIGH)
-    {
-      Serial.println("DOWN");
-      delay(200);
-      return DOWN;
-    }
-    else if (digitalRead(CANCEL) == HIGH)
-    {
-      Serial.println("CANCEL");
-      delay(200);
-      return CANCEL;
-    }
-    else if (digitalRead(OK) == HIGH)
-    {
-      Serial.println("OK");
-      delay(200);
-      return OK;
-    }
-    update_time();
-    return 0;
-  
+  else if (digitalRead(DOWN) == HIGH)
+  {
+    Serial.println("DOWN");
+    delay(200);
+    return DOWN;
+  }
+  else if (digitalRead(CANCEL) == HIGH)
+  {
+    Serial.println("CANCEL");
+    delay(200);
+    return CANCEL;
+  }
+  else if (digitalRead(OK) == HIGH)
+  {
+    Serial.println("OK");
+    delay(200);
+    return OK;
+  }
+  update_time();
+  return 0;
 }
 
-//done
+// function for setting the time zone
 void set_time_zone()
 {
   int minute_offset = 0;
@@ -275,28 +273,32 @@ void set_time_zone()
   {
     display.clearDisplay();
     print_line("Enter time zone: ", 0, 0, 1);
-    if(minute_offset < 0){
-      print_line("-"+String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 1, 11, 0);
+    if (minute_offset < 0)
+    {
+      print_line("-" + String(abs(minute_offset / 60)) + " : " + String(abs(minute_offset) % 60), 1, 11, 0);
     }
-    else{
-      print_line(String(abs(minute_offset/60)) + " : " + String(abs(minute_offset)%60), 1, 11, 0);
+    else
+    {
+      print_line(String(abs(minute_offset / 60)) + " : " + String(abs(minute_offset) % 60), 1, 11, 0);
     }
     int pressed = button_press();
     if (pressed == UP)
     {
-      if(minute_offset<720){
-        minute_offset+=30;
+      if (minute_offset < 720)
+      {
+        minute_offset += 30;
       }
     }
     else if (pressed == DOWN)
     {
-      if(minute_offset>-720){
-        minute_offset-=30;
+      if (minute_offset > -720)
+      {
+        minute_offset -= 30;
       }
     }
     else if (pressed == OK)
     {
-      UTC_OFFSET = minute_offset*60;
+      UTC_OFFSET = minute_offset * 60;
       Serial.println(UTC_OFFSET);
       display.clearDisplay();
       print_line("Time zone set.", 1, 0, 0);
@@ -314,6 +316,7 @@ void set_time_zone()
   }
 }
 
+// function for setting time
 void set_time()
 {
   int temp_hour = hours;
@@ -395,6 +398,7 @@ void set_time()
   delay(1000);
 }
 
+// function for setting an alarm
 void set_alarm(int alarm)
 {
   int temp_hour = alarm_hours[alarm];
@@ -470,6 +474,7 @@ void set_alarm(int alarm)
   delay(1000);
 }
 
+// to toggle between items in the menu
 void run_mode(int mode)
 {
   if (mode == 0)
@@ -485,25 +490,27 @@ void run_mode(int mode)
   {
     alarm_enabled = false;
   }
-  else if(mode == 5){
+  else if (mode == 5)
+  {
     set_time_zone();
-    
   }
 }
 
 // function to navigate through the menu
 void go_to_menu(void)
 {
-while (true){
-  display.clearDisplay();
-  print_line(options[current_mode], 1, 0, 0);
-  int pressed = button_press();
+  while (true)
+  {
+    display.clearDisplay();
+    print_line(options[current_mode], 1, 0, 0);
+    int pressed = button_press();
     if (pressed == UP)
     {
-      current_mode = (current_mode+1)%max_modes;
+      current_mode = (current_mode + 1) % max_modes;
     }
-    else if (pressed == DOWN){
-      current_mode = (current_mode+5)%max_modes;
+    else if (pressed == DOWN)
+    {
+      current_mode = (current_mode + 5) % max_modes;
     }
     else if (pressed == OK)
     {
@@ -514,9 +521,10 @@ while (true){
     {
       return;
     }
-}
+  }
 }
 
+// check and print the humidity level and the temprature
 void check_temp_humd(void)
 {
   TempAndHumidity data = dhtSensor.getTempAndHumidity();
@@ -609,12 +617,13 @@ void setup()
   display.clearDisplay();
   print_line("Connected to Wifi!!!", 1, 0, 0);
 
-  set_time_zone();
+  set_time_zone(); // ask to enter the time zone
 }
 
 void loop()
 {
-  if(button_press()==OK){
+  if (button_press() == OK)
+  {
     go_to_menu();
   }
   update_time_with_check_alarm();
