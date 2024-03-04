@@ -8,7 +8,6 @@
 
 // Defnitions
 #define NTP_SERVER "pool.ntp.org"
-#define UTC_OFFSET 19800
 #define UTC_OFFSET_DST 0
 
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
@@ -51,7 +50,9 @@ int hours = 0;
 int minutes = 0;
 int seconds = 0;
 
-String months[] = {"january","february","march","april","may","june","july","august","september","october","november","december"};
+int UTC_OFFSET = 19800;
+
+String months[] = {"january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"};
 
 bool alarm_enabled = false;
 int n_alarms = 2;
@@ -144,35 +145,35 @@ void update_time(void)
     }
   }
 
-  //Occasionally update the time from NTC server
-  // if (minutes == 5)
-  // {
-  //   update_time_wifi();
-  // }
+  // Occasionally update the time from NTC server
+  //  if (minutes == 5)
+  //  {
+  //    update_time_wifi();
+  //  }
 }
 
 // alarm when the temp and the humidity are not in the range
-void alarm_temp_humidity(int n,int note)
+void alarm_temp_humidity(int n, int note)
 {
   // ring the buzzer
-      if (digitalRead(CANCEL) == HIGH) // if not in the menu
-      {
-        delay(200);
-        return;
-      }
-      for(int i =0; i <n; i++){
-        tone(BUZZER, notes[note]);
-      delay(100);
-      noTone(BUZZER);
-      delay(100);
-      }
-      Serial.println("Buzzerrr");
+  if (digitalRead(CANCEL) == HIGH) // if not in the menu
+  {
+    delay(200);
+    return;
+  }
+  for (int i = 0; i < n; i++)
+  {
+    tone(BUZZER, notes[note]);
+    delay(100);
+    noTone(BUZZER);
+    delay(100);
+  }
 }
 
 // function to display the current time DD:HH:MM:SS
 void print_time_now(void)
 {
-  print_line(String(days)+" "+month+" "+String(year), 1, 0, 0);
+  print_line(String(days) + " " + month + " " + String(year), 1, 0, 0);
   print_line(String(hours), 2, 16, 0);
   print_line(":", 2, 16, 20);
   print_line(String(minutes), 2, 16, 30);
@@ -262,6 +263,58 @@ int wait_for_button_press()
   }
 }
 
+void set_time_zone()
+{
+  int hour_offset = 0;
+  int minute_offset = 0;
+  while (true)
+  {
+    print_line("Enter time zone: " + String(hour_offset) + " : " + String(abs(minute_offset)), 0, 0, 1);
+    int pressed = wait_for_button_press();
+    if (pressed == UP)
+    {
+      delay(200);
+      if(hour_offset < 12 && (minute_offset == 30 || minute_offset == -30)){
+        hour_offset += 1;
+        minute_offset = 0;
+      }
+      else if(hour_offset < 0 && minute_offset == 0){
+        minute_offset = -30;
+        hour_offset += 1;
+      }
+      else if(hour_offset < 12 && minute_offset == 0){
+        minute_offset = 30;
+      }
+    }
+
+    else if (pressed == DOWN)
+    {
+      if(hour_offset > -12 && (minute_offset == 30 || minute_offset == -30)){
+        hour_offset -= 1;
+        minute_offset = 0;
+      }
+      else if(hour_offset > 0 && minute_offset == 0){
+        minute_offset = 30;
+        hour_offset -=1;
+      }
+      else if(hour_offset > -12 && minute_offset == 0){
+        minute_offset = -30;
+      }
+      
+    }
+    else if (pressed == OK)
+    {
+      delay(200);
+      UTC_OFFSET = hour_offset*3600+minute_offset*60;
+      print_line("Time zone set.", 0, 0, 1);
+    }
+    else if (pressed == CANCEL)
+    {
+      delay(200);
+      return;
+    }
+  }
+}
 void set_time()
 {
   int temp_hour = hours;
@@ -489,7 +542,7 @@ void check_temp(void)
     digitalWrite(LED_2, HIGH);
     digitalWrite(LED_1, LOW);
     print_line("TEMP HIGH", 1, 45, 0);
-    alarm_temp_humidity(2,7);
+    alarm_temp_humidity(2, 7);
   }
   else if (data.temperature < 25)
   {
@@ -497,10 +550,11 @@ void check_temp(void)
     digitalWrite(LED_2, HIGH);
     digitalWrite(LED_1, LOW);
     print_line("TEMP LOW", 1, 45, 0);
-    alarm_temp_humidity(2,0);
+    alarm_temp_humidity(2, 0);
   }
-  else{
-    print_line("Temprature is:"+String(data.temperature)+"C", 1, 45, 0);
+  else
+  {
+    print_line("Temprature is:" + String(data.temperature) + "C", 1, 45, 0);
   }
   if (data.humidity > 85)
   {
@@ -508,7 +562,7 @@ void check_temp(void)
     digitalWrite(LED_2, HIGH);
     digitalWrite(LED_1, LOW);
     print_line("HUMD HIGH", 1, 56, 0);
-    alarm_temp_humidity(3,7);
+    alarm_temp_humidity(3, 7);
   }
   else if (data.humidity < 35)
   {
@@ -516,10 +570,11 @@ void check_temp(void)
     digitalWrite(LED_2, HIGH);
     digitalWrite(LED_1, LOW);
     print_line("HUMD LOW", 1, 56, 0);
-    alarm_temp_humidity(3,0);
+    alarm_temp_humidity(3, 0);
   }
-    else{
-    print_line("Humidity is:"+String(data.humidity)+"%", 1, 56, 0);
+  else
+  {
+    print_line("Humidity is:" + String(data.humidity) + "%", 1, 56, 0);
   }
   if (all_good)
   {
@@ -534,7 +589,7 @@ void check_temp(void)
 //   printLocalTime();
 // }
 
-void setup() 
+void setup()
 {
   Serial.begin(9600);
 
@@ -564,7 +619,6 @@ void setup()
   print_line("Welcome to Medibox", 1, 0, 0); // (String, text_size, cursor_row, cursor_column)
   delay(3000);
 
-  
   WiFi.begin("Wokwi-GUEST", "", 6);
   while (WiFi.status() != WL_CONNECTED)
   {
