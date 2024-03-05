@@ -50,6 +50,8 @@ int hours = 0;
 int minutes = 0;
 int seconds = 0;
 
+bool muted = false; // mute temprature and humidity level alarm
+
 // UTC offset for NTC time server
 int UTC_OFFSET = 19800;
 
@@ -155,14 +157,18 @@ void alarm_temp_humidity(int n, int note)
   if (digitalRead(CANCEL) == HIGH) // if not in the menu
   {
     delay(200);
+    muted = !muted;
     return;
   }
-  for (int i = 0; i < n; i++)
+  if(!muted)
   {
-    tone(BUZZER, notes[note]);
-    delay(100);
-    noTone(BUZZER);
-    delay(100);
+    for (int i = 0; i < n; i++)
+    {
+      tone(BUZZER, notes[note]);
+      delay(100);
+      noTone(BUZZER);
+      delay(100);
+    }
   }
 }
 
