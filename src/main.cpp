@@ -277,7 +277,7 @@ int button_press()
 }
 
 // function for setting the time zone
-void set_time_zone()
+void set_time_zone(bool start)
 {
   int minute_offset = 0;
   while (true)
@@ -320,11 +320,19 @@ void set_time_zone()
     else if (pressed == CANCEL)
     {
       display.clearDisplay();
-      print_line("Default timezone set.", 1, 0, 0,1);
-      print_line("UTC+5.30", 1, 11, 0,1);
-      delay(1000);
-      update_time_wifi();
-      return;
+      if(start){
+        print_line("Default timezone set.", 1, 0, 0,1);
+        print_line("UTC+5.30", 1, 11, 0,1);
+        delay(1000);
+        update_time_wifi();
+        return;
+      }
+      else{
+        print_line("Timezone not set.", 1, 0, 0,1);
+        delay(1000);
+        return;
+      }
+      
     }
     display.display();
   }
@@ -506,7 +514,7 @@ void run_mode(int mode)
   }
   else if (mode == 5)
   {
-    set_time_zone();
+    set_time_zone(0);
   }
 }
 
@@ -633,7 +641,7 @@ void setup()
   print_line("Connected to Wifi!!!", 1, 0, 0,1);
   delay(2000);
 
-  set_time_zone(); // ask to enter the time zone
+  set_time_zone(1); // ask to enter the time zone
 }
 
 void loop()
