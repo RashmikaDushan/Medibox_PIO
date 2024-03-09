@@ -29,6 +29,7 @@ void run_mode(int mode)
     else if (mode == 4)
     {
         alarm_enabled = false;
+        disable_all_alarms();
     }
     else if (mode == 5)
     {

@@ -35,6 +35,7 @@ extern String months[];
 // Alarm variables
 // Enable/Disable all alarms
 extern bool alarm_enabled;
+extern bool alarms_enabled[];
 // Number of alarms
 extern int n_alarms;
 // Alarm hours

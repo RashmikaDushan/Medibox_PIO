@@ -50,10 +50,10 @@ void setup()
 
 void loop()
 {
-  if (button_press() == OK)
+  if (button_press() == OK) // If pressed OK, go to the menu
   {
     go_to_menu();
   }
-  update_time_temp_humd_alarm();
+  update_time_temp_humd_alarm(); // Update the display with the time, temperature, humidity and check alarms
   delay(100);
 }

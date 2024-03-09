@@ -17,3 +17,4 @@ void go_to_menu(void);
 void check_temp_humd(void);
 void print_time(tm timeinfo);
 struct tm convertTimezone(tm &source_time, int offset_seconds);
+void disable_all_alarms();

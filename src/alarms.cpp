@@ -27,7 +27,8 @@ int alarm_hours[] = {0, 0, 0};
 // Alarm minutes
 int alarm_minutes[] = {1, 10, 0};
 // Alarm triggered
-bool alarm_triggered[] = {false, false, false, false};
+bool alarm_triggered[] = {false, false, false};
+bool alarms_enabled[] = {false, false, false};
 
 // ring an alarm
 void ring_alarm()
@@ -87,13 +88,12 @@ void check_alarms()
     // iterating through all alarms
     for (int i = 0; i < n_alarms; i++)
     {
-      if (alarm_triggered[i] == false && rtc.getHour(true) == alarm_hours[i] && rtc.getMinute() == alarm_minutes[i])
+      if (alarm_triggered[i] == false && alarms_enabled[i] == true && rtc.getHour(true) == alarm_hours[i] && rtc.getMinute() == alarm_minutes[i])
       {
         // Show message on display
         display.clearDisplay();
         print_line("Alarm " + String(i), 1, 0, 0, true);
         print_line("Medicine Time", 1, 11, 0, true);
-        Serial.println("Alarm is ringing");
         ring_alarm(); // call the ringing function
         alarm_triggered[i] = true;
       }
@@ -128,7 +128,6 @@ void set_alarm(int alarm)
 
     else if (pressed == OK)
     {
-      alarm_hours[alarm] = temp_hour;
       break;
     }
 
@@ -162,8 +161,11 @@ void set_alarm(int alarm)
 
     else if (pressed == OK)
     {
+      alarm_hours[alarm] = temp_hour;
       alarm_minutes[alarm] = temp_minute;
       alarm_enabled = true;
+      alarms_enabled[alarm] = true;
+      alarm_triggered[alarm] = false;
       break;
     }
 
@@ -176,3 +178,11 @@ void set_alarm(int alarm)
   print_line("Alarm is set", 0, 0, 2, 1);
   delay(1000);
 }
+
+void disable_all_alarms()
+{
+  for (int i = 0; i < n_alarms; i++)
+  {
+    alarms_enabled[i] = false;
+  }
+};
