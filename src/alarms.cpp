@@ -79,19 +79,20 @@ void alarm_temp_humidity(int n, int note)
   }
 }
 
-void check_alarms(){
+void check_alarms()
+{
   // check for alarms
   if (alarm_enabled)
   {
     // iterating through all alarms
     for (int i = 0; i < n_alarms; i++)
     {
-      if (alarm_triggered[i] == false && hours == alarm_hours[i] && minutes == alarm_minutes[i])
+      if (alarm_triggered[i] == false && rtc.getHour(true) == alarm_hours[i] && rtc.getMinute() == alarm_minutes[i])
       {
         // Show message on display
         display.clearDisplay();
-        print_line("Alarm " + String(i), 1, 0, 0 , true);
-        print_line("Medicine Time", 1, 11, 0 , true);
+        print_line("Alarm " + String(i), 1, 0, 0, true);
+        print_line("Medicine Time", 1, 11, 0, true);
         Serial.println("Alarm is ringing");
         ring_alarm(); // call the ringing function
         alarm_triggered[i] = true;
@@ -107,7 +108,7 @@ void set_alarm(int alarm)
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter hour: " + String(temp_hour), 0, 0, 2,1);
+    print_line("Enter hour: " + String(temp_hour), 0, 0, 2, 1);
 
     int pressed = button_press();
     if (pressed == UP)
@@ -141,7 +142,7 @@ void set_alarm(int alarm)
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter minute: " + String(temp_minute), 0, 0, 2,1);
+    print_line("Enter minute: " + String(temp_minute), 0, 0, 2, 1);
 
     int pressed = button_press();
     if (pressed == UP)
@@ -172,6 +173,6 @@ void set_alarm(int alarm)
     }
   }
   display.clearDisplay();
-  print_line("Alarm is set", 0, 0, 2,1);
+  print_line("Alarm is set", 0, 0, 2, 1);
   delay(1000);
 }

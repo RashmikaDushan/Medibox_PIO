@@ -2,14 +2,14 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <DHTesp.h>
-
+#include <ESP32Time.h>
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
 // object Declarations
 extern Adafruit_SSD1306 display; // Declaration for an SSD1306 display
-extern DHTesp dhtSensor; // Declaration for a DHT sensor
+extern DHTesp dhtSensor;         // Declaration for a DHT sensor
 
 // Variables
 // Notes for the buzzer
@@ -18,11 +18,12 @@ extern int notes[];
 
 // Time variables for the RTC
 extern int year;
-extern String month;
+extern int month;
 extern int days;
 extern int hours;
 extern int minutes;
 extern int seconds;
+extern struct tm timeinfo;
 
 extern bool muted; // Mute temprature and humidity level alarm
 
@@ -53,5 +54,7 @@ extern int current_mode;
 extern int max_modes;
 // Main menu options
 extern String options[];
+
+extern ESP32Time rtc;
 
 #endif // GLOBALS_H

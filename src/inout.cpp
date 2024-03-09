@@ -3,13 +3,14 @@
 #include <globals.h>
 
 // function to print a line of text in a given text size and the given position
-void print_line(String text, int text_size, int row, int column,bool printImmediatly)
+void print_line(String text, int text_size, int row, int column, bool printImmediatly)
 {
   display.setTextSize(text_size);      // Normal 1:1 pixel scale
   display.setTextColor(SSD1306_WHITE); // Draw white text
   display.setCursor(column, row);      // Start at (row, column)
   display.println(text);
-  if(printImmediatly){
+  if (printImmediatly)
+  {
     display.display();
   }
 }
@@ -42,7 +43,5 @@ int button_press()
     delay(500);
     return OK;
   }
-  update_time();
   return 0;
 }
-

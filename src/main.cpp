@@ -55,5 +55,5 @@ void loop()
     go_to_menu();
   }
   update_time_temp_humd_alarm();
-  delay(400);
+  delay(100);
 }
