@@ -64,8 +64,8 @@ void alarm_temp_humidity(int n, int note)
   // ring the buzzer
   if (digitalRead(CANCEL) == LOW) // if not in the menu
   {
-    delay(200);
     muted = !muted;
+    delay(200);
     return;
   }
   if (!muted)
