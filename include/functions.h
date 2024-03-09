@@ -1,6 +1,4 @@
 #include <Wire.h>
-#include <globals.h>
-#include <definitions.h>
 
 void print_line(String text, int text_size, int row, int column,bool printImmediatly);
 

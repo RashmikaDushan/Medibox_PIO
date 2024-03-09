@@ -12,10 +12,10 @@
 #define LED_GREEN 15 // Green LED pin
 #define LED_RED 2 // RED LED pin
 
-#define CANCEL 32 // Cancel button
-#define UP 33 // Up button
-#define DOWN 35 // Down button
-#define OK 34 // OK button
+#define CANCEL 25 // Cancel button
+#define UP 26 // Up button
+#define DOWN 33 // Down button
+#define OK 32 // OK button
 
 #define DHT 12 // DHT sensor pin
 

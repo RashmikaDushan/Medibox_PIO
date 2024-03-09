@@ -4,6 +4,7 @@
 
 #include <functions.h>
 #include <definitions.h>
+#include <globals.h>
 
 void setup()
 {
