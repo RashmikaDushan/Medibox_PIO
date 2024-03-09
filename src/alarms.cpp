@@ -1,6 +1,7 @@
 #include <functions.h>
 #include <definitions.h>
 #include <globals.h>
+#include <icons.h>
 
 // Variables
 // Notes for the buzzer
@@ -93,7 +94,7 @@ void check_alarms()
         // Show message on display
         display.clearDisplay();
         print_line("Alarm " + String(i), 1, 0, 0, true);
-        print_line("Medicine Time", 1, 11, 0, true);
+        print_line("Medicine Time", 2, 11, 0, true);
         ring_alarm(); // call the ringing function
         alarm_triggered[i] = true;
       }
@@ -104,11 +105,14 @@ void check_alarms()
 // function for setting an alarm
 void set_alarm(int alarm)
 {
+    bool go_to_next = true;
   int temp_hour = alarm_hours[alarm];
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter hour: " + String(temp_hour), 0, 0, 2, 1);
+    print_line("Enter hour: ", 1, 10, 30, false);
+    print_line(String(temp_hour), 2, 35, 60, false);
+    display.display();
 
     int pressed = button_press();
     if (pressed == UP)
@@ -133,15 +137,22 @@ void set_alarm(int alarm)
 
     else if (pressed == CANCEL)
     {
+      go_to_next = false;
+      display.clearDisplay();
+      print_line("   Alarm is not set", 1, 30, 0, true);
+      delay(2000);
+      play_animaton(1, cross, 2, 32, 48, 16);
       break;
     }
   }
 
   int temp_minute = alarm_minutes[alarm];
-  while (true)
+  while (go_to_next)
   {
     display.clearDisplay();
-    print_line("Enter minute: " + String(temp_minute), 0, 0, 2, 1);
+    print_line("Enter minute: ", 1, 10, 25, false);
+    print_line(String(temp_minute), 2, 35, 60, false);
+    display.display();
 
     int pressed = button_press();
     if (pressed == UP)
@@ -166,24 +177,34 @@ void set_alarm(int alarm)
       alarm_enabled = true;
       alarms_enabled[alarm] = true;
       alarm_triggered[alarm] = false;
+      display.clearDisplay();
+      print_line("     Alarm is set", 1, 30, 0, true);
+      delay(2000);
+      play_animaton(1, tick, 2, 32, 48, 16);
       break;
     }
 
     else if (pressed == CANCEL)
     {
+      display.clearDisplay();
+      print_line("   Alarm is not set", 1, 30, 0, true);
+      delay(2000);
+      play_animaton(1, cross, 2, 32, 48, 16);
       break;
     }
   }
-  display.clearDisplay();
-  print_line("Alarm is set", 0, 0, 2, 1);
-  delay(1000);
+  go_to_next = true;
 }
 
 void disable_all_alarms()
 {
+  display.clearDisplay();
+  print_line(" All alarms disabled", 1, 30, 0, true);
   alarm_enabled = false;
   for (int i = 0; i < n_alarms; i++)
   {
     alarms_enabled[i] = false;
   }
+  delay(2000);
+  play_animaton(1, tick, 2, 32, 48, 16);
 };

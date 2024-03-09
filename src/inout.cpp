@@ -2,6 +2,9 @@
 #include <definitions.h>
 #include <globals.h>
 
+// object Declarations
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // Declaration for an SSD1306 display
+
 // function to print a line of text in a given text size and the given position
 void print_line(String text, int text_size, int row, int column, bool printImmediatly)
 {

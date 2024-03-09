@@ -7,13 +7,13 @@ int current_mode = 0;
 // Number of main menu options
 int max_modes = 7;
 // Main menu options
-String options[] = {"1 - Set Time",
-                    "2 - Set Alarm 1",
-                    "3 - Set Alarm 2",
-                    "4 - Set Alarm 3",
-                    "5 - Remove Alarm",
-                    "6 - Set Timezone",
-                    "7 - Fetch Time from  Wifi"};
+String options[] = {"     1                Set Time",
+                    "     2               Set Alarm     1",
+                    "     3               Set Alarm     2",
+                    "     4               Set Alarm     3",
+                    "     5                Remove      Alarm",
+                    "     6                 Set     Timezone",
+                    "     7              Fetch Time from Wifi"};
 
 // to toggle between items in the menu
 void run_mode(int mode)
@@ -28,7 +28,6 @@ void run_mode(int mode)
     }
     else if (mode == 4)
     {
-        alarm_enabled = false;
         disable_all_alarms();
     }
     else if (mode == 5)
@@ -47,7 +46,7 @@ void go_to_menu(void)
     while (true)
     {
         display.clearDisplay();
-        print_line(options[current_mode], 1, 0, 0, true);
+        print_line(options[current_mode], 2, 0, 0, true);
         int pressed = button_press();
         if (pressed == UP)
         {

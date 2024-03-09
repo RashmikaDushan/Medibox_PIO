@@ -3,7 +3,6 @@
 #include <definitions.h>
 
 // object Declarations
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET); // Declaration for an SSD1306 display
 DHTesp dhtSensor;                                                         // Declaration for a DHT sensor
 
 // check and print the humidity level and the temprature

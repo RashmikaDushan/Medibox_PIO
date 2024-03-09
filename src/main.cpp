@@ -5,6 +5,7 @@
 #include <functions.h>
 #include <definitions.h>
 #include <globals.h>
+#include <icons.h>
 
 void setup()
 {
@@ -30,19 +31,24 @@ void setup()
   }
 
   display.clearDisplay(); // Clear the display
-  print_line("Welcome to Medibox", 1, 0, 0, true);
+  print_line("Welcome", 2, 0, 22, true);
+  print_line("to", 1, 18, 57, true);
+  print_line("Medibox", 2, 29, 22, true);
+  print_line("210057R", 1, 53, 45, true);
   delay(3000);
+  play_animaton(3,heartbeat,4,48,40, 8);
 
   WiFi.begin(SSID, PASSWORD, 6);
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(250);
     display.clearDisplay();
-    print_line("Connecting to Wifi   " + String(SSID), 1, 0, 0, true); // (String, text_size, cursor_row, cursor_column)
+    print_line(" Connecting to Wifi!    " + String(SSID), 1, 20, 0, true); // (String, text_size, cursor_row, cursor_column)
   }
   delay(2000);
+  play_animaton(1,wifi,2,32,48, 16);
   display.clearDisplay();
-  print_line("Connected to Wifi!!!", 1, 0, 0, true);
+  print_line(" Connected to Wifi!!!", 1, 30, 0, true);
   delay(2000);
 
   set_time_zone(true); // ask to enter the time zone

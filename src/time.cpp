@@ -3,6 +3,7 @@
 #include <functions.h>
 #include <globals.h>
 #include <definitions.h>
+#include <icons.h>
 
 // Time variables for the RTC
 int year = 0;
@@ -49,8 +50,9 @@ void update_time_wifi(void)
   seconds = atoi(sec_str);
   rtc.setTime(seconds, minutes, hours, days, month, year);
   display.clearDisplay();
-  print_line("Time updated online!", 1, 0, 0, true);
+  print_line(" Time updated online!", 1, 30, 0, true);
   delay(2000);
+  play_animaton(1, cloud, 2, 32, 48, 16);
   display.clearDisplay();
 }
 
@@ -67,8 +69,8 @@ void print_time_now(void)
     days = rtc.getDay();
   }
   display.clearDisplay();
-  print_line(rtc.getDate(), 1, 0, 0, false);
-  print_line(rtc.getTime(), 2, 16, 0, false);
+  print_line(rtc.getDate(), 1, 0, 16, false);
+  print_line(rtc.getTime(), 2, 16, 16, false);
 }
 
 // function to automatically update the current time while checking for alarms
@@ -87,14 +89,17 @@ void set_time_zone(bool start)
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter time zone: ", 0, 0, 1, false);
+    print_line("Enter time zone: ", 1, 10, 20, false);
     if (minute_offset < 0)
     {
-      print_line("-" + String(abs(minute_offset / 60)) + " : " + String(abs(minute_offset) % 60), 1, 11, 0, false);
+      print_line("-", 2, 35, 10, false);
+      print_line(String(abs(minute_offset / 60)), 2, 35, 35, false);
+      print_line("  : " + String(abs(minute_offset) % 60), 2, 35, 35, false);
     }
     else
     {
-      print_line(String(abs(minute_offset / 60)) + " : " + String(abs(minute_offset) % 60), 1, 11, 0, false);
+      print_line(String(abs(minute_offset / 60)), 2, 35, 35, false);
+      print_line("  : " + String(abs(minute_offset) % 60), 2, 35, 35, false);
     }
     int pressed = button_press();
     if (pressed == UP)
@@ -117,8 +122,9 @@ void set_time_zone(bool start)
       rtc.offset = UTC_OFFSET_RTC;
       Serial.println(UTC_OFFSET_RTC);
       display.clearDisplay();
-      print_line("Time zone set.", 1, 0, 0, true);
-      delay(1000);
+      print_line("    Time zone set.", 1, 30, 0, true);
+      delay(2000);
+      play_animaton(1, tick, 2, 32, 48, 16);
       update_time_wifi();
       return;
     }
@@ -127,17 +133,19 @@ void set_time_zone(bool start)
       display.clearDisplay();
       if (start)
       {
-        print_line("Default timezone set.", 1, 0, 0, true);
-        print_line("UTC+5.30", 1, 11, 0, 1);
+        print_line("Default timezone set.", 1, 25, 0, true);
+        print_line("      UTC+5.30", 1, 36, 0, true);
         rtc.offset = UTC_OFFSET_RTC;
-        delay(1000);
+        delay(2000);
+        play_animaton(1, tick, 2, 32, 48, 16);
         update_time_wifi();
         return;
       }
       else
       {
-        print_line("Timezone not set.", 1, 0, 0, true);
-        delay(1000);
+        print_line("  Timezone not set.", 1, 25, 0, true);
+        delay(2000);
+        play_animaton(1, cross, 2, 32, 48, 16);
         return;
       }
     }
@@ -154,7 +162,9 @@ void set_time()
   while (true)
   {
     display.clearDisplay();
-    print_line("Enter hour: " + String(temp_hour), 1, 0, 0, true);
+    print_line("Enter hour: ", 1, 10, 30, false);
+    print_line(String(temp_hour), 2, 35, 60, false);
+    display.display();
 
     int pressed = button_press();
     if (pressed == UP)
@@ -179,8 +189,9 @@ void set_time()
     {
       go_to_next = false;
       display.clearDisplay();
-      print_line("Time is not set", 1, 0, 0, true);
+      print_line("   Time is not set", 1, 30, 0, true);
       delay(2000);
+      play_animaton(1, cross, 2, 32, 48, 16);
       break;
     }
   }
@@ -189,7 +200,9 @@ void set_time()
   while (go_to_next)
   {
     display.clearDisplay();
-    print_line("Enter minute: " + String(temp_minute), 1, 0, 0, true);
+    print_line("Enter minute: ", 1, 10, 25, false);
+    print_line(String(temp_minute), 2, 35, 60, false);
+    display.display();
 
     int pressed = button_press();
     if (pressed == UP)
@@ -213,16 +226,18 @@ void set_time()
       timeinfo.tm_hour = temp_hour;
       timeinfo = convertTimezone(timeinfo, UTC_OFFSET_RTC);
       display.clearDisplay();
-      print_line("Time is set", 1, 0, 0, true);
+      print_line("     Time is set", 1, 30, 0, true);
       delay(2000);
+      play_animaton(1, tick, 2, 32, 48, 16);
       break;
     }
 
     else if (pressed == CANCEL)
     {
       display.clearDisplay();
-      print_line("Time is not set", 1, 0, 0, true);
+      print_line("   Time is not set", 1, 30, 0, true);
       delay(2000);
+      play_animaton(1, cross, 2, 32, 48, 16);
       break;
     }
   }
