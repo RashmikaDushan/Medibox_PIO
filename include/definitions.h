@@ -19,5 +19,5 @@
 
 #define DHT 12 // DHT sensor pin
 
-#define SSID "SLT-Fiber-4B2B"  // Wifi SSID
-#define PASSWORD "msii6267963" // Wifi password
+#define SSID "Wokwi-GUEST"  // Wifi SSID
+#define PASSWORD "" // Wifi password
