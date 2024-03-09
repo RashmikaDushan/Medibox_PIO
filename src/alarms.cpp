@@ -53,9 +53,9 @@ void ring_alarm()
       delay(2);
     }
   }
-  delay(200);
   digitalWrite(LED_GREEN, LOW);
   digitalWrite(LED_RED, LOW);
+  delay(200);
 }
 
 // alarm when the temp and the humidity are not in the range
@@ -181,6 +181,7 @@ void set_alarm(int alarm)
 
 void disable_all_alarms()
 {
+  alarm_enabled = false;
   for (int i = 0; i < n_alarms; i++)
   {
     alarms_enabled[i] = false;
