@@ -3,12 +3,18 @@
 #include <definitions.h>
 
 // object Declarations
-DHTesp dhtSensor;                                                         // Declaration for a DHT sensor
+DHTesp dhtSensor;// Declaration for a DHT sensor
 
 // check and print the humidity level and the temprature
-void check_temp_humd(void)
+char* check_temp_humd(void)
 {
+    StaticJsonDocument<200> doc;
+
     TempAndHumidity data = dhtSensor.getTempAndHumidity();
+
+    doc["temperature"] = data.temperature; // Create a JSON object
+    doc["humidity"] = data.humidity;
+
     bool all_good = true;
     if (data.temperature > 35)
     {
@@ -55,4 +61,9 @@ void check_temp_humd(void)
         digitalWrite(LED_RED, LOW);
         digitalWrite(LED_GREEN, HIGH);
     }
+
+    char* jsonData = new char[200];
+    serializeJson(doc, jsonData, 200);
+    
+    return jsonData;
 }

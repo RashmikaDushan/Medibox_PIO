@@ -1,12 +1,17 @@
 // Libraries
 #include <WiFi.h>
 #include <Wire.h>
+#include <ArduinoJson.h>
 
 #include <functions.h>
 #include <definitions.h>
 #include <globals.h>
 #include <icons.h>
 #include <mqtt.h>
+#include <ldr.h>
+
+char* ldr_data;
+char* temp_data;
 
 void setup()
 {
@@ -58,23 +63,17 @@ void setup()
 
   set_time_zone(true); // ask to enter the time zone
   mqtt_setup(); // MQTT setup
-
-  int ldr_1 = analogRead(LDR1); // Initial LDR1 value
-  int ldr_2 = analogRead(LDR2); // Initial LDR2 value
+  ldr_data=ldr_read();
 }
 
 void loop()
-{
-  mqtt_loop();
-  // Serial.print("LDR 1");
-  // Serial.println(analogRead(LDR1));
-  // Serial.print("LDR 2");
-  // Serial.println(analogRead(LDR2));  
-  delay(1000);   
+{ 
   if (button_press() == OK) // If pressed OK, go to the menu
   {
     go_to_menu();
   }
-  update_time_temp_humd_alarm(); // Update the display with the time, temperature, humidity and check alarms
+  temp_data = update_time_temp_humd_alarm(); // Update the display with the time, temperature, humidity and check alarms
   delay(100);
+  ldr_data = ldr_read(); // LDR JSON data
+  mqtt_loop(ldr_data, temp_data);
 }

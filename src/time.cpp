@@ -21,6 +21,7 @@ char hour_str[8];
 char min_str[8];
 char sec_str[8];
 
+
 int UTC_OFFSET_RTC = 19800; // UTC offset for RTC clock - +5.30 for Sri Lanka
 int UTC_OFFSET_NTC = 0;     // UTC offset for NTC time server
 ESP32Time rtc(UTC_OFFSET_RTC);
@@ -74,12 +75,15 @@ void print_time_now(void)
 }
 
 // function to automatically update the current time while checking for alarms
-void update_time_temp_humd_alarm()
+char* update_time_temp_humd_alarm()
 {
+
   print_time_now();
-  check_temp_humd();
+  char* jsonData = check_temp_humd();
   display.display();
   check_alarms();
+
+  return jsonData;
 }
 
 // function for setting the time zone
