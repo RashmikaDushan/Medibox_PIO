@@ -33,19 +33,19 @@ const char* root_ca = \
 
 // MQTT broker details
 const char* mqtt_server = "test.mosquitto.org";
-const int mqtt_port = 1883;
+const int mqtt_port = 8883;
 // const char* mqtt_username = "rush";
 // const char* mqtt_password = "dushan";
 const char* mqtt_sub_topic = "dushan/sub";
 const char* mqtt_pub_topic = "dushan/pub";
 
-// WiFiClientSecure espClient;
-PubSubClient client;
+WiFiClientSecure espClient;
+PubSubClient client(espClient);
 
 void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESP32Client")) {
+    if (client.connect("Dushanbalasooriya_ESP32Client")) {
       Serial.println("connected");
       client.subscribe(mqtt_sub_topic);
     } else {
@@ -70,10 +70,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 void mqtt_setup() {
-  // espClient.setCACert(root_ca);
+  espClient.setCACert(root_ca);
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
-  client.setKeepAlive(15);
   Serial.println("MQTT setup done");
 }
 
