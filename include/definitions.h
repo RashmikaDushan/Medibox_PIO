@@ -12,12 +12,15 @@
 #define LED_GREEN 15 // Green LED pin
 #define LED_RED 2    // RED LED pin
 
-#define CANCEL 25 // Cancel button
+#define CANCEL 33 // Cancel button
 #define UP 26     // Up button
-#define DOWN 33   // Down button
+#define DOWN 25   // Down button
 #define OK 32     // OK button
 
 #define DHT 12 // DHT sensor pin
 
-#define SSID "Wokwi-GUEST"  // Wifi SSID
-#define PASSWORD "" // Wifi password
+#define LDR1 35 // LDR1 pin
+#define LDR2 34 // LDR2 pin
+
+#define SSID "SLT-Fiber-4B2B"  // Wifi SSID
+#define PASSWORD "msii6267963" // Wifi password

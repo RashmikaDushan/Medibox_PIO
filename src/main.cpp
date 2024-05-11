@@ -6,6 +6,7 @@
 #include <definitions.h>
 #include <globals.h>
 #include <icons.h>
+#include <mqtt.h>
 
 void setup()
 {
@@ -20,6 +21,9 @@ void setup()
   pinMode(UP, INPUT_PULLUP);     // Up button input pin
   pinMode(DOWN, INPUT_PULLUP);   // Down button input pin
   pinMode(OK, INPUT_PULLUP);     // OK button input pin
+
+  pinMode(LDR1, INPUT); // LDR1 input pin
+  pinMode(LDR2, INPUT); // LDR2 input pin
 
   dhtSensor.setup(DHT, DHTesp::DHT22); // DHT sensor setup
 
@@ -49,13 +53,24 @@ void setup()
   play_animaton(1,wifi,2,32,48, 16);
   display.clearDisplay();
   print_line(" Connected to Wifi!!!", 1, 30, 0, true);
+  Serial.println("Connected to Wifi");
   delay(2000);
 
   set_time_zone(true); // ask to enter the time zone
+  mqtt_setup(); // MQTT setup
+
+  int ldr_1 = analogRead(LDR1); // Initial LDR1 value
+  int ldr_2 = analogRead(LDR2); // Initial LDR2 value
 }
 
 void loop()
 {
+  mqtt_loop();
+  // Serial.print("LDR 1");
+  // Serial.println(analogRead(LDR1));
+  // Serial.print("LDR 2");
+  // Serial.println(analogRead(LDR2));  
+  delay(1000);   
   if (button_press() == OK) // If pressed OK, go to the menu
   {
     go_to_menu();
