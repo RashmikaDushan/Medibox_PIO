@@ -14,6 +14,7 @@ const int mqtt_port = 1883;
 // const char* mqtt_password = "dushan";
 const char* mqtt_sub_topic_ang = "dushan/sub/ang";
 const char* mqtt_sub_topic_fac = "dushan/sub/fac";
+const char* mqtt_sub_topic_on = "dushan/sub/on_off";
 const char* mqtt_pub_topic_ldr = "dushan/pub/ldr";
 const char* mqtt_pub_topic_temp = "dushan/pub/temp";
 
@@ -24,15 +25,30 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
+    Serial.print("Message arrived [");
+    Serial.print(topic);
+    Serial.print("] ");
 
-  if (strcmp(topic, mqtt_sub_topic_ang) == 0) {
-    min_angle =  atoi((char*)payload);
-  } else if (strcmp(topic, mqtt_sub_topic_fac) == 0) {
-    control_fac = atof((char*)payload);
-  }
+    char temp[length + 1];  // Temporary character array for on_off
+
+    
+    for (unsigned int i = 0; i < length; i++) {
+        temp[i] = (char)payload[i];
+    }
+    temp[length] = '\0';
+
+    if (strcmp(topic, mqtt_sub_topic_ang) == 0) {
+        min_angle = atoi(temp);
+    } else if (strcmp(topic, mqtt_sub_topic_fac) == 0) {
+        control_fac = atof(temp);
+    } else if (strcmp(topic, mqtt_sub_topic_on) == 0) {
+        if (strcmp(temp, "true") == 0) {
+            on_off = true;
+        } else if (strcmp(temp, "false") == 0) {
+            on_off = false;
+        }
+        Serial.println(on_off);
+    }
 
   servo_control(min_angle,control_fac);
 }
@@ -44,6 +60,7 @@ void reconnect() {
       Serial.println("connected");
       client.subscribe(mqtt_sub_topic_ang);
       client.subscribe(mqtt_sub_topic_fac);
+      client.subscribe(mqtt_sub_topic_on);
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());

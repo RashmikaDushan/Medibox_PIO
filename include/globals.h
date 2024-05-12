@@ -65,4 +65,6 @@ extern float light_intensity;
 extern int angle;
 extern int servoPin;
 
+extern bool on_off;
+
 #endif // GLOBALS_H

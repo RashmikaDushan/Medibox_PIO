@@ -13,6 +13,7 @@
 
 char* ldr_data;
 char* temp_data;
+bool on_off = 1;
 
 void setup()
 {
