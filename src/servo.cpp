@@ -29,12 +29,6 @@ void servo_control(int min_angle, float control_fac)
   {
     angle = 180;
   }
-  Serial.print("angle: ");
-  Serial.print(angle);
-    Serial.print(" min angle: ");
-  Serial.print(min_angle);
-    Serial.print(" fac: ");
-  Serial.println(control_fac);
   myservo.write(angle);
   delay(15);
 }

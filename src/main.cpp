@@ -67,17 +67,23 @@ void setup()
   mqtt_setup(); // MQTT setup
   ldr_data=ldr_read();
   setup_servo(); // Servo setup
-  servo_control(min_angle,control_fac);
 }
 
 void loop()
 { 
-  if (button_press() == OK) // If pressed OK, go to the menu
+  if(on_off){
+    if (button_press() == OK) // If pressed OK, go to the menu
   {
     go_to_menu();
   }
   temp_data = update_time_temp_humd_alarm(); // Update the display with the time, temperature, humidity and check alarms
   delay(100);
   ldr_data = ldr_read(); // LDR JSON data
+  }
+  else{
+    display.clearDisplay();
+    print_line("System is off", 1, 30, 0, true);
+    delay(1000);}
+  servo_control(min_angle,control_fac);
   mqtt_loop(ldr_data, temp_data);
 }
