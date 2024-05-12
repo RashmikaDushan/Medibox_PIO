@@ -14,14 +14,37 @@ const int mqtt_port = 1883;
 const char *mqtt_sub_topic_ang = "dushan/sub/ang";
 const char *mqtt_sub_topic_fac = "dushan/sub/fac";
 const char *mqtt_sub_topic_on = "dushan/sub/on_off";
+const char *mqtt_sub_topic_med = "dushan/sub/med";
 const char *mqtt_pub_topic_ldr = "dushan/pub/ldr";
 const char *mqtt_pub_topic_temp = "dushan/pub/temp";
 
 int min_angle = 30;
 float control_fac = 0.75;
+int medicine = 4;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+void change_medicine_type(int medicine)
+{
+  switch (medicine)
+  {
+  case 1:
+    min_angle = 30;
+    control_fac = 0.75;
+    break;
+  case 2:
+    min_angle = 60;
+    control_fac = 0.75;
+    break;
+  case 3:
+    min_angle = 30;
+    control_fac = 0.5;
+    break;
+  default:
+    break;
+  }
+}
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
@@ -57,6 +80,12 @@ void callback(char *topic, byte *payload, unsigned int length)
   {
     control_fac = atof(temp);
   }
+  else if (strcmp(topic, mqtt_sub_topic_med) == 0)
+  {
+    medicine = atoi(temp);
+  }
+
+  change_medicine_type(medicine);
 
   if (on_off)
   {
@@ -75,6 +104,7 @@ void reconnect()
       client.subscribe(mqtt_sub_topic_ang);
       client.subscribe(mqtt_sub_topic_fac);
       client.subscribe(mqtt_sub_topic_on);
+      client.subscribe(mqtt_sub_topic_med);
     }
     else
     {
@@ -106,7 +136,7 @@ void mqtt_loop(char *ldr_data, char *temp_data)
   if (millis() - lastMillis > 5000)
   {
     lastMillis = millis();
-    
+
     if (on_off)
     {
       client.publish(mqtt_pub_topic_ldr, ldr_data);

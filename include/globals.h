@@ -64,6 +64,7 @@ extern bool max_ldr_left;
 extern float light_intensity;
 extern int angle;
 extern int servoPin;
+extern int medicine;
 
 extern bool on_off;
 
