@@ -9,6 +9,8 @@
 
 #define BUZZER 18 // Buzzer pin
 
+#define servo_pin 19 // Servo pin
+
 #define LED_GREEN 15 // Green LED pin
 #define LED_RED 2    // RED LED pin
 
@@ -24,3 +26,19 @@
 
 #define SSID "SLT-Fiber-4B2B"  // Wifi SSID
 #define PASSWORD "msii6267963" // Wifi password
+
+
+// Default values for min anflge, control factor for each medicine type
+#define default_angle 30
+#define default_fac 0.75
+
+#define medA_angle 45
+#define medA_fac 0.25
+
+#define medB_angle 60
+#define medB_fac 0.5
+
+#define medC_angle 75
+#define medC_fac 0.6
+
+#define default_med_type 4 // Default medicine type when power on

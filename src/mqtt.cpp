@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 #include <globals.h>
+#include <definitions.h>
 
 #include <mqtt.h>
 #include <servo.h>
@@ -9,18 +10,20 @@
 // MQTT broker details
 const char *mqtt_server = "test.mosquitto.org";
 const int mqtt_port = 1883;
-// const char* mqtt_username = "rush";
-// const char* mqtt_password = "dushan";
+// Subscribed topics
 const char *mqtt_sub_topic_ang = "dushan/sub/ang";
 const char *mqtt_sub_topic_fac = "dushan/sub/fac";
 const char *mqtt_sub_topic_on = "dushan/sub/on_off";
 const char *mqtt_sub_topic_med = "dushan/sub/med";
+
+// Publishing topics
 const char *mqtt_pub_topic_ldr = "dushan/pub/ldr";
 const char *mqtt_pub_topic_temp = "dushan/pub/temp";
 
-int min_angle = 30;
-float control_fac = 0.75;
-int medicine = 4;
+// Default values
+int min_angle = default_angle;
+float control_fac = default_fac;
+int medicine = default_med_type;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -30,16 +33,16 @@ void change_medicine_type(int medicine)
   switch (medicine)
   {
   case 1:
-    min_angle = 30;
-    control_fac = 0.75;
+    min_angle = medA_angle;
+    control_fac = medA_fac;
     break;
   case 2:
-    min_angle = 60;
-    control_fac = 0.75;
+    min_angle = medB_angle;
+    control_fac = medB_fac;
     break;
   case 3:
-    min_angle = 30;
-    control_fac = 0.5;
+    min_angle = medC_angle;
+    control_fac = medC_fac;
     break;
   default:
     break;
@@ -52,7 +55,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   Serial.print(topic);
   Serial.print("] ");
 
-  char temp[length + 1]; // Temporary character array for on_off
+  char temp[length + 1]; // Temporary character array for payload
 
   for (unsigned int i = 0; i < length; i++)
   {
@@ -60,33 +63,44 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
   temp[length] = '\0';
 
+  // Change the main switch on / off
   if (strcmp(topic, mqtt_sub_topic_on) == 0)
   {
+    // if recieved true, on_off = true
     if (strcmp(temp, "true") == 0)
     {
       on_off = true;
     }
+    // else on_off = false
     else if (strcmp(temp, "false") == 0)
     {
       on_off = false;
     }
     Serial.println(on_off);
   }
+
+  // Change the min angle
   else if (strcmp(topic, mqtt_sub_topic_ang) == 0)
   {
     min_angle = atoi(temp);
   }
+
+  // Change the control factor
   else if (strcmp(topic, mqtt_sub_topic_fac) == 0)
   {
     control_fac = atof(temp);
   }
+
+  // Change the medicine type
   else if (strcmp(topic, mqtt_sub_topic_med) == 0)
   {
     medicine = atoi(temp);
   }
 
+  // change the min angle and control factor according to the medicine type
   change_medicine_type(medicine);
 
+  // If main switch is on control the servo
   if (on_off)
   {
     servo_control(min_angle, control_fac);
@@ -131,7 +145,6 @@ void mqtt_loop(char *ldr_data, char *temp_data)
   }
   client.loop();
 
-  // Send a test message every 5 seconds
   static unsigned long lastMillis = 0;
   if (millis() - lastMillis > 5000)
   {

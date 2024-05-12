@@ -56,6 +56,7 @@ extern int max_modes;
 // Main menu options
 extern String options[];
 
+// RTC object
 extern ESP32Time rtc;
 
 extern int min_angle;
