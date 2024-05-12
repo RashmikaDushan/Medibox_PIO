@@ -17,10 +17,10 @@
 #define DOWN 25   // Down button
 #define OK 32     // OK button
 
-#define DHT 12 // DHT sensor pin
+#define DHT 27 // DHT sensor pin
 
-#define LDR1 35 // LDR1 pin
-#define LDR2 34 // LDR2 pin
+#define LDR_Left 35 // LDR1 pin
+#define LDR_Right 34 // LDR2 pin
 
 #define SSID "SLT-Fiber-4B2B"  // Wifi SSID
 #define PASSWORD "msii6267963" // Wifi password

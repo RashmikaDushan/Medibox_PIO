@@ -12,7 +12,7 @@ char* check_temp_humd(void)
 
     TempAndHumidity data = dhtSensor.getTempAndHumidity();
 
-    doc["temperature"] = data.temperature; // Create a JSON object
+    doc["temperature"] =  data.temperature; // Create a JSON object
     doc["humidity"] = data.humidity;
 
     bool all_good = true;

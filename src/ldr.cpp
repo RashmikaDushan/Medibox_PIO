@@ -1,23 +1,31 @@
 #include <ldr.h>
 #include <definitions.h>
+#include <globals.h>
 
-int ldr_1;
-int ldr_2;
+int ldr_left;
+int ldr_right;
+
+float light_intensity = 0.0;
+bool max_ldr_left = false;
 
 char* ldr_read() {
   
   StaticJsonDocument<200> doc;
 
-  ldr_1 = analogRead(LDR1); // Read LDR1 value
-  ldr_2 = analogRead(LDR2); // Read LDR2 value
+  ldr_left = analogRead(LDR_Left); // Read LDR1 value
+  ldr_right = analogRead(LDR_Right); // Read LDR2 value
 
-  if(ldr_1 <= ldr_2){
-    doc["ldr"] = ldr_1;
-    doc["ldr_number"] = 1;
+  if(ldr_left >= ldr_right){
+    doc["ldr"] = ldr_right;
+    doc["ldr_number"] = "Right";
+    light_intensity = (4096-ldr_right)/4096;
+    max_ldr_left = false;
   }
   else{
-    doc["ldr"] = ldr_2;
-    doc["ldr_number"] = 2;
+    doc["ldr"] = ldr_left;
+    doc["ldr_number"] = "Left";
+    max_ldr_left = true;
+    light_intensity = (4096-ldr_left)/4096;
   }
 
   char* jsonData = new char[200];

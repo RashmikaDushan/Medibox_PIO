@@ -58,4 +58,11 @@ extern String options[];
 
 extern ESP32Time rtc;
 
+extern int min_angle;
+extern float control_fac;
+extern bool max_ldr_left;
+extern float light_intensity;
+extern int angle;
+extern int servoPin;
+
 #endif // GLOBALS_H

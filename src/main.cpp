@@ -9,6 +9,7 @@
 #include <icons.h>
 #include <mqtt.h>
 #include <ldr.h>
+#include <servo.h>
 
 char* ldr_data;
 char* temp_data;
@@ -27,8 +28,8 @@ void setup()
   pinMode(DOWN, INPUT_PULLUP);   // Down button input pin
   pinMode(OK, INPUT_PULLUP);     // OK button input pin
 
-  pinMode(LDR1, INPUT); // LDR1 input pin
-  pinMode(LDR2, INPUT); // LDR2 input pin
+  pinMode(LDR_Left, INPUT); // LDR1 input pin
+  pinMode(LDR_Right, INPUT); // LDR2 input pin
 
   dhtSensor.setup(DHT, DHTesp::DHT22); // DHT sensor setup
 
@@ -64,6 +65,8 @@ void setup()
   set_time_zone(true); // ask to enter the time zone
   mqtt_setup(); // MQTT setup
   ldr_data=ldr_read();
+  setup_servo(); // Servo setup
+  servo_control(min_angle,control_fac);
 }
 
 void loop()
